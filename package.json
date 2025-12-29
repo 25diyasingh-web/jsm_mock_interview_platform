@@ -14,9 +14,13 @@
     "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cors": "^2.8.5",
     "dayjs": "^1.11.19",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
     "framer-motion": "^12.23.24",
     "lucide-react": "^0.554.0",
+    "mongoose": "^9.0.2",
     "next": "16.0.3",
     "next-themes": "^0.4.6",
     "react": "19.2.0",
@@ -38,5 +42,21 @@
     "eslint": "^9",
     "eslint-config-next": "16.0.3",
     "typescript": "^5"
-  }
+  },
+  "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).",
+  "main": "tailwind.config.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/25diyasingh-web/jsm_mock_interview_platform.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/25diyasingh-web/jsm_mock_interview_platform/issues"
+  },
+  "homepage": "https://github.com/25diyasingh-web/jsm_mock_interview_platform#readme"
 }

@@ -45,3 +45,15 @@ export const getRandomInterviewCover = () => {
   const randomIndex = Math.floor(Math.random() * interviewCovers.length);
   return `/covers${interviewCovers[randomIndex]}`;
 };
+
+// Deterministic cover selection by id to avoid SSR/CSR hydration mismatches
+export const getInterviewCoverForId = (id?: string) => {
+  if (!id) return `/covers${interviewCovers[0]}`;
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = (hash << 5) - hash + id.charCodeAt(i);
+    hash |= 0; // Convert to 32bit integer
+  }
+  const idx = Math.abs(hash) % interviewCovers.length;
+  return `/covers${interviewCovers[idx]}`;
+};

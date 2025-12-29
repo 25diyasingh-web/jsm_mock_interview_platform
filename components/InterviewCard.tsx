@@ -1,14 +1,15 @@
 import dayjs from 'dayjs';
 import Image from "next/image";
-import {getRandomInterviewCover} from "@/lib/utils";
+import { getInterviewCoverForId } from "@/lib/utils";
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
 import DisplayTechIcons from "@/components/DisplayTechIcons";
 
-const InterviewCard = ({ interviewId, role, type, techStack, createdAt }: InterviewCardProps) => {
+const InterviewCard = ({ interviewId, id, role, type, techStack, createdAt }: InterviewCardProps & { id?: string }) => {
     const feedback = null as Feedback | null;
     const normalizedType = /mix/gi.test(type) ? 'Mixed' : type;
     const formattedDate = dayjs(feedback?.createdAt ?? createdAt ?? new Date()).format("MMM D, YYYY");
+    const stableCover = getInterviewCoverForId(interviewId ?? (id as string));
 
 
     return (
@@ -19,7 +20,7 @@ const InterviewCard = ({ interviewId, role, type, techStack, createdAt }: Interv
                       <p className="badge-text">{normalizedType}</p>
                   </div>
 
-                  <Image src={getRandomInterviewCover()} alt="cover image" width={90} height={90} className="rounded-full object-fit size-[90px]" />
+                  <Image src={stableCover} alt="cover image" width={90} height={90} className="rounded-full object-fit size-[90px]" />
 
                   <h3 className="mt-5 capitalize">
                       {role} Interview
