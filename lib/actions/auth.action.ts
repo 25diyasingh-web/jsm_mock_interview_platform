@@ -104,3 +104,14 @@ export async function signOut() {
   // must match backend cookie name exactly
   cookieStore.delete('token');
 }
+
+/* =======================
+   AUTH CHECK
+======================= */
+
+export async function isAuthenticated(): Promise<boolean> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token");
+
+  return Boolean(token);
+}
