@@ -2,11 +2,8 @@
 
 import { cookies } from 'next/headers';
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-
 /* =======================
-   TYPES (JWT AUTH)
+   TYPES
 ======================= */
 
 export interface SignUpParams {
@@ -26,23 +23,24 @@ export interface SignInParams {
 
 export async function signUp(params: SignUpParams) {
   try {
-    const res = await fetch(`${API_BASE_URL}/auth/signup`, {
-      method: 'POST',
-      credentials: "include",
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(params),
+    const { name, email, password } = params;
+
+    // TODO:
+    // 1. Validate input
+    // 2. Check if user exists
+    // 3. Hash password
+    // 4. Save user to DB
+    // 5. Create JWT
+
+    // fake token for now
+    const token = 'dummy-token';
+
+    const cookieStore = await cookies();
+    cookieStore.set('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
     });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      return {
-        success: false,
-        message: data?.message || 'Failed to create account',
-      };
-    }
 
     return {
       success: true,
@@ -63,23 +61,21 @@ export async function signUp(params: SignUpParams) {
 
 export async function signIn(params: SignInParams) {
   try {
-    const res = await fetch(`${API_BASE_URL}/auth/signin`, {
-      method: 'POST',
-      credentials: "include",
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(params),
+    const { email, password } = params;
+
+    // TODO:
+    // 1. Find user by email
+    // 2. Compare password hash
+    // 3. Create JWT
+
+    const token = 'dummy-token';
+
+    const cookieStore = await cookies();
+    cookieStore.set('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
     });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      return {
-        success: false,
-        message: data?.message || 'Failed to sign in',
-      };
-    }
 
     return {
       success: true,
@@ -100,8 +96,6 @@ export async function signIn(params: SignInParams) {
 
 export async function signOut() {
   const cookieStore = await cookies();
-
-  // must match backend cookie name exactly
   cookieStore.delete('token');
 }
 
@@ -111,7 +105,5 @@ export async function signOut() {
 
 export async function isAuthenticated(): Promise<boolean> {
   const cookieStore = await cookies();
-  const token = cookieStore.get("token");
-
-  return Boolean(token);
+  return Boolean(cookieStore.get('token'));
 }

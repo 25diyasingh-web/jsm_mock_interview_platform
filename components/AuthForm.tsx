@@ -12,7 +12,8 @@ import Link from "next/link";
 import { toast } from "sonner";
 import FormField from "@/components/FormField";
 import { useRouter } from "next/navigation";
-import { signUp } from "@/lib/actions/auth.action"; // ✅ ONLY signUp
+import { signIn, signUp } from "@/lib/actions/auth.action";
+
 
 type FormType = "sign-in" | "sign-up";
 
@@ -29,10 +30,9 @@ const authFormSchema = (type: FormType) =>
 const AuthForm = ({ type }: { type: FormType }) => {
   const router = useRouter();
   const isSignIn = type === "sign-in";
-  const formSchema = authFormSchema(type);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<ReturnType<typeof authFormSchema>>>({
+    resolver: zodResolver(authFormSchema(type)),
     defaultValues: {
       name: "",
       email: "",
@@ -40,60 +40,39 @@ const AuthForm = ({ type }: { type: FormType }) => {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
+  const onSubmit = async (
+  values: z.infer<ReturnType<typeof authFormSchema>>
+) => {
+  try {
+    const result = isSignIn
+      ? await signIn({
+          email: values.email,
+          password: values.password,
+        })
+      : await signUp({
+          name: values.name,
+          email: values.email,
+          password: values.password,
+        });
 
-/* =======================
-   SIGN IN — CLIENT FETCH
-======================= */
-if (isSignIn) {
-  const res = await fetch("http://localhost:5000/api/auth/signin", {
-    method: "POST",
-    credentials: "include", // REQUIRED
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email: values.email,
-      password: values.password,
-    }),
-  });
-
-  const data = await res.json();
-
-  if (!res.ok) {
-    toast.error(data.message || "Sign in failed");
-    return;
-  }
-
-  toast.success("Signed in successfully");
-  router.push("/");
-  return;
-}
-
-
-      /* =======================
-         SIGN UP — SERVER ACTION
-      ======================= */
-      const res = await signUp({
-        name: values.name!,
-        email: values.email,
-        password: values.password,
-      });
-
-      if (!res?.success) {
-        toast.error(res?.message || "Sign up failed");
-        return;
-      }
-
-      toast.success("Account created. Please sign in.");
-      router.push("/sign-in");
-
-    } catch (error) {
-      console.error(error);
-      toast.error("Something went wrong. Please try again.");
+    if (!result.success) {
+      toast.error(result.message);
+      return;
     }
-  };
+
+    toast.success(result.message);
+
+    if (isSignIn) {
+      router.push("/");
+    } else {
+      router.push("/sign-in");
+    }
+  } catch (error) {
+    console.error("AUTH ERROR:", error);
+    toast.error("Something went wrong");
+  }
+};
+
 
   return (
     <div className="card-border lg:min-w-[566px]">

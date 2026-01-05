@@ -9,7 +9,7 @@ const openai = createOpenAI({
 const model = openai("openai/gpt-4o-mini");
 
 console.log(
-  "🔥 OPENROUTER KEY:",
+  "🔥 OPENMOUTHED KEY:",
   process.env.OPENAI_API_KEY ? "FOUND" : "MISSING"
 );
 
