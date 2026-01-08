@@ -1,39 +1,27 @@
 "use server";
 
 import { cookies } from "next/headers";
-
 /* =======================
    SIGN IN
 ======================= */
 export async function signInAction(formData: FormData) {
-  const email = String(formData.get("email") ?? "");
-  const password = String(formData.get("password") ?? "");
+  const email = formData.get("email");
+  const password = formData.get("password");
 
-  if (!email || !password) {
-    throw new Error("Email and password are required");
-  }
+  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL ?? ""}/api/auth/signin`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+    cache: "no-store",
+  });
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/signin`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-      cache: "no-store",
-    }
-  );
-
-  let data;
-  try {
-    data = await res.json();
-  } catch {
-    throw new Error("Invalid server response");
-  }
+  const data = await res.json();
 
   if (!res.ok) {
-    throw new Error(data?.message || "Sign in failed");
+    throw new Error(data.message || "Sign in failed");
   }
 
   return data;
@@ -43,11 +31,13 @@ export async function signInAction(formData: FormData) {
    CURRENT USER
 ======================= */
 export async function getCurrentUser() {
-  const token = (await cookies()).get("token")?.value;
+  const cookieStore = cookies();
+  const token = cookieStore.get("token")?.value;
+
   if (!token) return null;
 
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/me`,
+    `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/api/auth/me`,
     {
       headers: {
         Cookie: `token=${token}`,
@@ -59,12 +49,16 @@ export async function getCurrentUser() {
   if (!res.ok) return null;
 
   const data = await res.json();
-  return data.user ?? null;
+  return data.user;
 }
+
 
 /* =======================
    AUTH CHECK
 ======================= */
-export async function isAuthenticated() {
-  return Boolean((await cookies()).get("token")?.value);
-}
+export const isAuthenticated = async () => {
+  const cookieStore = cookies();
+  const token = cookieStore.get("token");
+
+  return Boolean(token?.value);
+};

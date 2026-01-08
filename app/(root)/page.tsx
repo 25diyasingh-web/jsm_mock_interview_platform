@@ -58,13 +58,14 @@ const Page = () => {
   <motion.div
     className="absolute left-0 bottom-0 pointer-events-none select-none opacity-30 z-0 text-[90px]"
     animate={{
-      x: [0, 120, 260, 420, 650, 800],
-      y: [0, -60, -140, -100, -200, -350],
-      rotate: [-10, 5, -5, 10, -10, 15],
-      scale: [0.8, 0.9, 1.0, 1.05, 1.1, 1.15],
-    }}
+      x: [0, 120, 260, 420, 650, 720, 800],
+      y: [0, -60, -140, -100, -200, -120, -350],
+      rotate: [-10, 5, -5, 10, -5, 5, -20],
+      scale: [0.8, 0.9, 1.0, 1.05, 1.1, 1.02, 1.15],
+}}
+
     transition={{
-      duration: 10,
+      duration: 15,
       repeat: Infinity,
       repeatType: "loop",
       ease: "easeInOut",
@@ -85,7 +86,7 @@ const Page = () => {
       variants={fadeUp}
       whileHover={{ y: -8, scale: 1.02 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className="p-8 rounded-2xl bg-grey shadow-sm hover:shadow-xl transition-shadow duration-300 border border-gray-100 group cursor-pointer"
+      className="p-6 md:ml-4 rounded-2xl bg-grey shadow-sm hover:shadow-xl transition-shadow duration-300 border border-gray-100 group cursor-pointer max-w-sm mx-auto"
     >
       <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-blue-50 mb-5 group-hover:scale-110 transition-transform duration-300">
         <Brain className="w-7 h-7 text-blue-600" />
@@ -102,7 +103,7 @@ const Page = () => {
       variants={fadeUp}
       whileHover={{ y: -8, scale: 1.02 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className="p-8 rounded-2xl bg-grey shadow-sm hover:shadow-xl transition-shadow duration-300 border border-gray-100 group cursor-pointer"
+      className="p-6 rounded-2xl bg-grey shadow-sm hover:shadow-xl transition-shadow duration-300 border border-gray-100 group cursor-pointer max-w-sm mx-auto"
     >
       <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-green-50 mb-5 group-hover:scale-110 transition-transform duration-300">
         <TrendingUp className="w-7 h-7 text-green-600" />
@@ -119,7 +120,7 @@ const Page = () => {
       variants={fadeUp}
       whileHover={{ y: -8, scale: 1.02 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className="p-8 rounded-2xl bg-grey shadow-sm hover:shadow-xl transition-shadow duration-300 border border-gray-100 group cursor-pointer"
+      className="p-6 md:mr-4 rounded-2xl bg-grey shadow-sm hover:shadow-xl transition-shadow duration-300 border border-gray-100 group cursor-pointer max-w-sm mx-auto"
     >
       <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-purple-50 mb-5 group-hover:scale-110 transition-transform duration-300">
         <Target className="w-7 h-7 text-purple-600" />
