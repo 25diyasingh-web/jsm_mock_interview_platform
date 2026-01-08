@@ -31,7 +31,7 @@ export async function signInAction(formData: FormData) {
    CURRENT USER
 ======================= */
 export async function getCurrentUser() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
 
   if (!token) return null;
@@ -57,7 +57,7 @@ export async function getCurrentUser() {
    AUTH CHECK
 ======================= */
 export const isAuthenticated = async () => {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get("token");
 
   return Boolean(token?.value);
