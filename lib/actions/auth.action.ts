@@ -1,6 +1,10 @@
 'use server';
 
 import { cookies } from 'next/headers';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
+import connectDB from '@/lib/db';
+import User from '@/lib/models/User';
 
 /* =======================
    TYPES
@@ -23,17 +27,28 @@ export interface SignInParams {
 
 export async function signUp(params: SignUpParams) {
   try {
+    await connectDB();
+
     const { name, email, password } = params;
 
-    // TODO:
-    // 1. Validate input
-    // 2. Check if user exists
-    // 3. Hash password
-    // 4. Save user to DB
-    // 5. Create JWT
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return { success: false, message: 'User already exists' };
+    }
 
-    // fake token for now
-    const token = 'dummy-token';
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+    });
+
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET!,
+      { expiresIn: '7d' }
+    );
 
     const cookieStore = await cookies();
     cookieStore.set('token', token, {
@@ -42,16 +57,10 @@ export async function signUp(params: SignUpParams) {
       path: '/',
     });
 
-    return {
-      success: true,
-      message: 'Account created successfully',
-    };
+    return { success: true, message: 'Account created successfully' };
   } catch (error) {
     console.error('Sign up error:', error);
-    return {
-      success: false,
-      message: 'Something went wrong during signup',
-    };
+    return { success: false, message: 'Signup failed' };
   }
 }
 
@@ -61,14 +70,25 @@ export async function signUp(params: SignUpParams) {
 
 export async function signIn(params: SignInParams) {
   try {
+    await connectDB();
+
     const { email, password } = params;
 
-    // TODO:
-    // 1. Find user by email
-    // 2. Compare password hash
-    // 3. Create JWT
+    const user = await User.findOne({ email });
+    if (!user) {
+      return { success: false, message: 'User not found' };
+    }
 
-    const token = 'dummy-token';
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) {
+      return { success: false, message: 'Invalid credentials' };
+    }
+
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET!,
+      { expiresIn: '7d' }
+    );
 
     const cookieStore = await cookies();
     cookieStore.set('token', token, {
@@ -77,16 +97,10 @@ export async function signIn(params: SignInParams) {
       path: '/',
     });
 
-    return {
-      success: true,
-      message: 'Signed in successfully',
-    };
+    return { success: true, message: 'Signed in successfully' };
   } catch (error) {
     console.error('Sign in error:', error);
-    return {
-      success: false,
-      message: 'Something went wrong during sign in',
-    };
+    return { success: false, message: 'Signin failed' };
   }
 }
 
@@ -106,4 +120,36 @@ export async function signOut() {
 export async function isAuthenticated(): Promise<boolean> {
   const cookieStore = await cookies();
   return Boolean(cookieStore.get('token'));
+}
+
+/* =======================
+   GET CURRENT USER
+======================= */
+
+export async function getCurrentUser() {
+  try {
+    await connectDB();
+
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+
+    if (!token) return null;
+
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET!
+    ) as { userId: string };
+
+    const user = await User.findById(decoded.userId).select('-password');
+    if (!user) return null;
+
+    return {
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+    };
+  } catch (error) {
+    console.error('Get current user error:', error);
+    return null;
+  }
 }

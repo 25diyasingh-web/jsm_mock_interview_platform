@@ -1,11 +1,9 @@
 import { generateText } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
-import { getRandomInterviewCover } from "@/lib/utils";
-import { cookies } from "next/headers";
-import { verifyJWT } from "@/lib/auth";
+import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Interview from "@/lib/models/Interview";
-
+import { getRandomInterviewCover } from "@/lib/utils";
 
 const openai = createOpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
@@ -18,13 +16,20 @@ export async function POST(req: Request) {
     await connectDB();
 
     const {
-      type,
       role,
+      type,
       level,
       techstack,
       amount,
       userId,
     } = await req.json();
+
+    if (!role || !type || !level || !techstack || !amount || !userId) {
+      return NextResponse.json(
+        { message: "Missing required fields" },
+        { status: 400 }
+      );
+    }
 
     const { text } = await generateText({
       model,
@@ -48,7 +53,7 @@ Format:
       text.replace(/```json|```/gi, "").trim()
     );
 
-    const interview = {
+    const interview = await Interview.create({
       role,
       type,
       level,
@@ -58,16 +63,19 @@ Format:
       finalized: true,
       coverImage: getRandomInterviewCover(),
       createdAt: new Date(),
-    };
+    });
 
-await Interview.create(interview);
-
-
-    return Response.json({ success: true }, { status: 200 });
+    return NextResponse.json(
+      {
+        success: true,
+        interviewId: interview._id.toString(),
+      },
+      { status: 200 }
+    );
   } catch (error) {
-    console.error("❌ ERROR:", error);
-    return Response.json(
-      { success: false, error: String(error) },
+    console.error("❌ INTERVIEW GENERATION ERROR:", error);
+    return NextResponse.json(
+      { message: "Failed to generate interview" },
       { status: 500 }
     );
   }

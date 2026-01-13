@@ -9,7 +9,9 @@ const InterviewCard = ({ interviewId, id, role, type, techStack, createdAt }: In
     const feedback = null as Feedback | null;
     const normalizedType = /mix/gi.test(type) ? 'Mixed' : type;
     const formattedDate = dayjs(feedback?.createdAt ?? createdAt ?? new Date()).format("MMM D, YYYY");
-    const stableCover = getInterviewCoverForId(interviewId ?? (id as string));
+    const resolvedInterviewId = interviewId || id!;
+    const stableCover = getInterviewCoverForId(resolvedInterviewId);
+
 
 
     return (
@@ -48,8 +50,8 @@ const InterviewCard = ({ interviewId, id, role, type, techStack, createdAt }: In
 
                     <Button className="btn-primary">
                         <Link href={feedback
-                            ? `/interview/${interviewId}/feedback`
-                            : `/interview/${interviewId}`
+                            ? `/interview/${resolvedInterviewId}/feedback`
+                            : `/interview/${resolvedInterviewId}`
                         }>
                             {feedback ? 'Check Feedback' : 'View Interview'}
                         </Link>

@@ -228,3 +228,29 @@ export const dummyInterviews: Interview[] = [
         createdAt: "2024-03-14T15:30:00Z",
     },
 ];
+
+//STANDARD POOL 
+export const standardInterviews: Interview[] = [
+  {
+    id: "std-fe",
+    userId: "system",
+    role: "Frontend Developer",
+    type: "Frontend",
+    techStack: ["HTML", "CSS", "JavaScript", "React"],
+    level: "Any",
+    questions: [],
+    finalized: false,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "std-be",
+    userId: "system",
+    role: "Backend Developer",
+    type: "Backend",
+    techStack: ["Node.js", "APIs", "Databases", "Auth"],
+    level: "Any",
+    questions: [],
+    finalized: false,
+    createdAt: new Date().toISOString(),
+  },
+];
